@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: #141414;
+      border-radius: 16px;
+      padding: 48px 32px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    .check-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(0, 184, 148, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 36px;
+    }
+    h1 { font-size: 24px; margin-bottom: 12px; }
+    p { color: #888; line-height: 1.6; margin-bottom: 8px; }
+    .order-id { color: #00b894; font-weight: 600; font-size: 18px; margin: 16px 0; }
+    .back-btn {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 14px 32px;
+      background: #fff;
+      color: #000;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .back-btn:hover { opacity: 0.9; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="check-icon">✓</div>
+    <h1>Payment Successful!</h1>
+    <p>Thank you for your order. Your payment has been received.</p>
+    <div class="order-id" id="orderId"></div>
+    <p>You will receive a confirmation email shortly with your order details and tracking information.</p>
+    <a href="#" class="back-btn" id="backBtn">Return to Store</a>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order_id');
+    document.getElementById('orderId').textContent = orderId ? `Order #${orderId}` : '';
+    // Update this URL to your Shopify store
+    document.getElementById('backBtn').href = 'https://YOUR-STORE.myshopify.com';
+  </script>
+</body>
+</html>

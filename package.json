@@ -1,0 +1,9 @@
+{
+  "name": "shopify-payment-gateway",
+  "version": "1.0.0",
+  "description": "NOWPayments & FedaPay integration for Shopify",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {}
+}

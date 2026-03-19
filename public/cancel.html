@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Cancelled</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: #141414;
+      border-radius: 16px;
+      padding: 48px 32px;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    .cancel-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(255, 107, 107, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 36px;
+    }
+    h1 { font-size: 24px; margin-bottom: 12px; }
+    p { color: #888; line-height: 1.6; margin-bottom: 8px; }
+    .buttons { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+    .btn {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn-primary { background: #fff; color: #000; }
+    .btn-secondary { background: #2a2a2a; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="cancel-icon">✕</div>
+    <h1>Payment Cancelled</h1>
+    <p>Your payment was not completed. No charges have been made.</p>
+    <p>If you'd like to try again, you can go back and select a payment method.</p>
+    <div class="buttons">
+      <a href="#" class="btn btn-primary" id="retryBtn">Try Again</a>
+      <a href="#" class="btn btn-secondary" id="storeBtn">Return to Store</a>
+    </div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order_id');
+    // Update these URLs
+    document.getElementById('retryBtn').href = orderId 
+      ? `${window.location.origin}/pay/?order_id=${orderId}&amount=${params.get('amount') || ''}&currency=${params.get('currency') || 'EUR'}` 
+      : 'javascript:history.back()';
+    document.getElementById('storeBtn').href = 'https://YOUR-STORE.myshopify.com';
+  </script>
+</body>
+</html>

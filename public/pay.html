@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Your Payment</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 480px;
+      width: 100%;
+      background: #141414;
+      border-radius: 16px;
+      padding: 40px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .logo h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .logo p {
+      color: #888;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .order-summary {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 28px;
+      border: 1px solid #2a2a2a;
+    }
+
+    .order-summary h3 {
+      font-size: 14px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .order-row span:first-child { color: #ccc; }
+    .order-row span:last-child { font-weight: 600; color: #fff; }
+
+    .order-row.total {
+      border-top: 1px solid #2a2a2a;
+      margin-top: 8px;
+      padding-top: 12px;
+      font-size: 18px;
+    }
+
+    .payment-methods {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .payment-btn {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 20px;
+      border-radius: 12px;
+      border: 2px solid #2a2a2a;
+      background: #1a1a1a;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 16px;
+      text-decoration: none;
+    }
+
+    .payment-btn:hover {
+      border-color: #4a4a4a;
+      background: #222;
+    }
+
+    .payment-btn.crypto:hover { border-color: #f7931a; }
+    .payment-btn.mobile:hover { border-color: #00b894; }
+
+    .payment-btn .icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .crypto .icon { background: rgba(247, 147, 26, 0.15); }
+    .mobile .icon { background: rgba(0, 184, 148, 0.15); }
+
+    .payment-btn .text h4 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .payment-btn .text p {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #333;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error {
+      display: none;
+      background: #2d1515;
+      border: 1px solid #5c2020;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      color: #ff6b6b;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .secure-note {
+      text-align: center;
+      color: #555;
+      font-size: 12px;
+      margin-top: 16px;
+    }
+
+    .secure-note svg {
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>Complete Your Payment</h1>
+      <p>Choose your preferred payment method</p>
+    </div>
+
+    <div class="order-summary" id="orderSummary">
+      <h3>Order Summary</h3>
+      <div class="order-row">
+        <span>Order</span>
+        <span id="displayOrderId">—</span>
+      </div>
+      <div class="order-row">
+        <span>Product</span>
+        <span id="displayProduct">Tangem Wallet</span>
+      </div>
+      <div class="order-row total">
+        <span>Total</span>
+        <span id="displayAmount">—</span>
+      </div>
+    </div>
+
+    <div class="error" id="errorMsg"></div>
+
+    <div class="payment-methods" id="paymentMethods">
+      <button class="payment-btn crypto" onclick="payWithCrypto()">
+        <div class="icon">₿</div>
+        <div class="text">
+          <h4>Pay with Crypto</h4>
+          <p>BTC, ETH, USDT & 100+ coins via NOWPayments</p>
+        </div>
+      </button>
+
+      <button class="payment-btn mobile" onclick="payWithMobileMoney()">
+        <div class="icon">📱</div>
+        <div class="text">
+          <h4>Pay with Mobile Money</h4>
+          <p>MTN, Moov, Orange Money via FedaPay</p>
+        </div>
+      </button>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Preparing your payment...</p>
+    </div>
+
+    <div class="secure-note">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0110 0v4"></path>
+      </svg>
+      Secure payment processing
+    </div>
+  </div>
+
+  <script>
+    // Get order details from URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get('order_id');
+    const amount = params.get('amount');
+    const currency = params.get('currency') || 'EUR';
+    const description = params.get('description') || 'Tangem Wallet';
+
+    // Get the API base URL (same domain as this page)
+    const API_BASE = window.location.origin;
+
+    // Display order info
+    document.getElementById('displayOrderId').textContent = `#${orderId || '—'}`;
+    document.getElementById('displayProduct').textContent = description;
+    document.getElementById('displayAmount').textContent = amount 
+      ? `${parseFloat(amount).toFixed(2)} ${currency}` 
+      : '—';
+
+    function showLoading() {
+      document.getElementById('paymentMethods').style.display = 'none';
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('errorMsg').style.display = 'none';
+    }
+
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('paymentMethods').style.display = 'flex';
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    async function payWithCrypto() {
+      if (!orderId || !amount) return showError('Missing order details. Please go back and try again.');
+      
+      showLoading();
+      try {
+        const res = await fetch(`${API_BASE}/api/nowpayments-create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_id: orderId,
+            amount: amount,
+            currency: currency.toLowerCase(),
+            order_description: `Order #${orderId} - ${description}`
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success && data.invoice_url) {
+          window.location.href = data.invoice_url;
+        } else {
+          showError('Failed to create crypto payment. Please try again.');
+        }
+      } catch (err) {
+        console.error(err);
+        showError('Connection error. Please check your internet and try again.');
+      }
+    }
+
+    async function payWithMobileMoney() {
+      if (!orderId || !amount) return showError('Missing order details. Please go back and try again.');
+
+      showLoading();
+      try {
+        const res = await fetch(`${API_BASE}/api/fedapay-create`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_id: orderId,
+            amount: amount,
+            currency: 'XOF', // FedaPay uses XOF
+            description: `Order #${orderId} - ${description}`
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.success && data.payment_url) {
+          window.location.href = data.payment_url;
+        } else {
+          showError('Failed to create mobile money payment. Please try again.');
+        }
+      } catch (err) {
+        console.error(err);
+        showError('Connection error. Please check your internet and try again.');
+      }
+    }
+  </script>
+</body>
+</html>
