@@ -67,26 +67,27 @@ This project adds crypto and mobile money payments to your Shopify store.
 | `NOWPAYMENTS_IPN_SECRET`    | Your NOWPayments IPN secret          | NOWPayments Dashboard → IPN Settings |
 | `FEDAPAY_SECRET_KEY`        | Your FedaPay secret key              | FedaPay Dashboard → API Keys         |
 | `FEDAPAY_ENV`               | `sandbox` (for testing) or `live`    | Use `sandbox` first, then `live`     |
-| `SHOPIFY_STORE_DOMAIN`      | `your-store.myshopify.com`           | Your Shopify admin URL               |
-| `SHOPIFY_ADMIN_API_TOKEN`   | Your Shopify Admin API access token  | See Step 5 below                     |
+| `SHOPIFY_SHOP`              | `your-store` (just the name)         | The part before .myshopify.com       |
+| `SHOPIFY_CLIENT_ID`         | Your Shopify app Client ID           | See Step 5 below                     |
+| `SHOPIFY_CLIENT_SECRET`     | Your Shopify app Client Secret       | See Step 5 below                     |
 
 3. After adding all variables, go to "Deployments" and click "Redeploy" on the latest deployment
 
-### STEP 5: Create a Shopify Admin API Token
+### STEP 5: Create a Shopify App (Client Credentials)
 1. In your Shopify admin, go to **Settings** → **Apps and sales channels**
 2. Click **"Develop apps"** (you may need to enable developer access first)
 3. Click **"Create an app"**
 4. Name it: `Payment Gateway`
-5. Click **"Configure Admin API scopes"**
+5. Go to **"Configuration"** → under Admin API integration, click **"Configure"**
 6. Enable these permissions:
    - `read_orders`
    - `write_orders`
    - `read_customers`
 7. Click **"Save"**
 8. Go to **"API credentials"** tab
-9. Click **"Install app"**
-10. Copy the **Admin API access token** (starts with `shpat_`)
-11. Add this token as `SHOPIFY_ADMIN_API_TOKEN` in Vercel (Step 4)
+9. Copy the **Client ID** and **Client Secret**
+10. Add them as `SHOPIFY_CLIENT_ID` and `SHOPIFY_CLIENT_SECRET` in Vercel (Step 4)
+11. Set `SHOPIFY_SHOP` to your store name (e.g., `my-store` — just the name, not `.myshopify.com`)
 
 ### STEP 6: Configure NOWPayments IPN
 1. Log into your NOWPayments dashboard
