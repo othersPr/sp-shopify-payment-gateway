@@ -8,6 +8,8 @@
  * Body: { order_id, amount, currency, description, customer }
  */
 
+const { createPayment } = require('./_db');
+
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -72,6 +74,15 @@ module.exports = async (req, res) => {
       console.error('FedaPay token error:', tokenData);
       return res.status(500).json({ error: 'Failed to generate payment token', details: tokenData });
     }
+
+    // Record payment in database
+    await createPayment({
+      order_id: String(order_id),
+      provider: 'fedapay',
+      amount: parseInt(amount),
+      currency: currency,
+      transaction_id: String(transactionId),
+    });
 
     return res.status(200).json({
       success: true,

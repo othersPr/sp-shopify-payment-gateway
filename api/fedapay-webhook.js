@@ -8,6 +8,7 @@
  */
 
 const { markShopifyOrderAsPaid } = require('./_shopify');
+const { isAlreadyPaid, markPaid, markFailed } = require('./_db');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -28,11 +29,25 @@ module.exports = async (req, res) => {
 
       if (orderMatch) {
         const orderId = orderMatch[1];
+
+        // Prevent double payment
+        if (await isAlreadyPaid(orderId)) {
+          console.log(`Order ${orderId} already paid, skipping`);
+          return res.status(200).json({ success: true, skipped: true });
+        }
+
         await markShopifyOrderAsPaid(orderId, {
           gateway: `FedaPay - ${transaction.currency?.iso || 'XOF'}`,
         });
+        await markPaid(orderId, 'fedapay', transaction.id?.toString());
       } else {
         console.error('Could not extract order_id from FedaPay transaction:', description);
+      }
+    } else if (eventType === 'transaction.declined' || eventType === 'transaction.canceled') {
+      const description = transaction.description || '';
+      const orderMatch = description.match(/Order #(\S+)/);
+      if (orderMatch) {
+        await markFailed(orderMatch[1], 'fedapay');
       }
     }
 

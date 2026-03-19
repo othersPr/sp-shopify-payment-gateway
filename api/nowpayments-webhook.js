@@ -10,6 +10,7 @@
 
 const crypto = require('crypto');
 const { markShopifyOrderAsPaid } = require('./_shopify');
+const { isAlreadyPaid, markPaid, markFailed } = require('./_db');
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -42,9 +43,18 @@ module.exports = async (req, res) => {
 
     // Only mark as paid when payment is fully confirmed
     if (payment_status === 'finished' || payment_status === 'confirmed') {
+      // Prevent double payment
+      if (await isAlreadyPaid(order_id)) {
+        console.log(`Order ${order_id} already paid, skipping`);
+        return res.status(200).json({ success: true, skipped: true });
+      }
+
       await markShopifyOrderAsPaid(order_id, {
         gateway: `NOWPayments - ${pay_currency}`,
       });
+      await markPaid(order_id, 'nowpayments', req.body.payment_id?.toString());
+    } else if (payment_status === 'failed' || payment_status === 'expired') {
+      await markFailed(order_id, 'nowpayments');
     }
 
     return res.status(200).json({ success: true });

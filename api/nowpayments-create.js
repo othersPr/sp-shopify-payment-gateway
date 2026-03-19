@@ -8,6 +8,8 @@
  * Body: { order_id, amount, currency, order_description }
  */
 
+const { createPayment } = require('./_db');
+
 module.exports = async (req, res) => {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -51,6 +53,15 @@ module.exports = async (req, res) => {
       console.error('NOWPayments error:', data);
       return res.status(500).json({ error: 'Failed to create invoice', details: data });
     }
+
+    // Record payment in database
+    await createPayment({
+      order_id: String(order_id),
+      provider: 'nowpayments',
+      amount: parseFloat(amount),
+      currency: currency.toLowerCase(),
+      transaction_id: String(data.id),
+    });
 
     return res.status(200).json({
       success: true,
