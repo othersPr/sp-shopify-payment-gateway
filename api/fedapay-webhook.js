@@ -5,15 +5,39 @@
  * Marks the Shopify order as paid when payment is approved.
  *
  * POST /api/fedapay-webhook
+ *
+ * Required env var: FEDAPAY_WEBHOOK_SECRET (the wh_... key from FedaPay webhook settings)
  */
 
+const crypto = require('crypto');
 const { markShopifyOrderAsPaid } = require('./_shopify');
 const { isAlreadyPaid, markPaid, markFailed } = require('./_db');
+
+function verifySignature(req) {
+  const secret = process.env.FEDAPAY_WEBHOOK_SECRET;
+  if (!secret) {
+    console.warn('FEDAPAY_WEBHOOK_SECRET not set — skipping signature verification');
+    return true;
+  }
+
+  const signature = req.headers['x-fedapay-signature'];
+  if (!signature) return false;
+
+  const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+  const expected = crypto.createHmac('sha256', secret).update(body).digest('hex');
+
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
+}
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   try {
+    if (!verifySignature(req)) {
+      console.error('FedaPay webhook signature verification failed');
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+
     const event = req.body;
 
     console.log('FedaPay webhook received:', JSON.stringify(event));
