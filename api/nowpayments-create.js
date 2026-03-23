@@ -42,8 +42,8 @@ module.exports = async (req, res) => {
         order_id: String(order_id),
         order_description: order_description || `Order #${order_id} - Tangem Wallet`,
         ipn_callback_url: `https://${VERCEL_URL}/api/nowpayments-webhook`,
-        success_url: `https://${VERCEL_URL}/public/success.html?order_id=${order_id}&method=crypto`,
-        cancel_url: `https://${VERCEL_URL}/public/cancel.html?order_id=${order_id}`
+        success_url: `https://${VERCEL_URL}/success.html?order_id=${order_id}&method=crypto`,
+        cancel_url: `https://${VERCEL_URL}/cancel.html?order_id=${order_id}`
       })
     });
 
